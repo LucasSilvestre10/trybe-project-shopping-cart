@@ -1,3 +1,4 @@
+const totalPrice = 'total-price';
 // Esse tipo de comentário que estão antes de todas as funções são chamados de JSdoc,
 // experimente passar o mouse sobre o nome das funções e verá que elas possuem descrições!
 
@@ -19,35 +20,25 @@ let sum = 0;
 const amount = (price, type) => {
   if (type === 'out') {
     sum -= price;
-  const value = document.getElementsByClassName('total-price'); 
-  value[0].innerHTML = sum;
+    const value = document.getElementsByClassName(totalPrice);
+    value[0].innerHTML = sum;
   } else {
     sum += price;
-    const value = document.getElementsByClassName('total-price');   
+    const value = document.getElementsByClassName(totalPrice);
     value[0].innerHTML = sum;
-  }
- /*  const value = document.getElementsByClassName('total-price');
-  const cartList = document.querySelector('.cart__items').childNodes;
-  if (cartList.length > 0) {
-    cartList.forEach(async (element) => {
-      const data = await fetchItem(element.id);
-      const { price } = data;
-      sum += price;
-      value[0].innerHTML = sum; 
-  });  
-  }  */  
+  }  
 };
 
 const saveCart = ({ id, title, price }) => {
   const save = [];
- /*  const { id, title, price } = params[0]; */
+  /*  const { id, title, price } = params[0]; */
   const obj = { id, title, price };
   const arrayLoad = getSavedCartItems('cartItem');
   if (arrayLoad) {
     arrayLoad.forEach((element) => {
       save.push(element);
     });
-  }  
+  }
   save.push(obj);
   saveCartItems(save);
 };
@@ -63,17 +54,17 @@ const removeCartItem = (id, price) => {
   let save = [];
   document.getElementById(id).remove();
   const arrayLoad = getSavedCartItems('cartItem');
-  if (arrayLoad) {      
+  if (arrayLoad) {
     const index = arrayLoad.findIndex((item) => item.id === id);
     arrayLoad.splice(index, 1);
     save = arrayLoad;
   }
-  
+
   amount(price, 'out');
   saveCartItems(save);
 };
 
-const createCartItemElement = ({ id, title, price }) => {  
+const createCartItemElement = ({ id, title, price }) => {
   const li = document.createElement('li');
   li.className = 'cart__item';
   const text = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
@@ -153,13 +144,25 @@ const loadCartItems = () => {
   const array = getSavedCartItems('cartItem');
   if (array) {
     array.forEach(async (item) => {
-      const cart = document.querySelector('.cart__items');      
+      const cart = document.querySelector('.cart__items');
       const { id, title, price } = item;
       amount(price);
       cart.appendChild(createCartItemElement({ id, title, price }));
     });
   }
 };
+const emptyCart = () => {  
+  const cart = document.querySelectorAll('.cart__item');
+  cart.forEach((element) => {
+    element.remove();
+  });  
+  sum = 0;
+  const value = document.getElementsByClassName(totalPrice);
+  value[0].innerHTML = sum;
+  localStorage.clear();
+};
+
+document.querySelector('.empty-cart').addEventListener('click', emptyCart);
 
 window.onload = () => {
   createPage();
