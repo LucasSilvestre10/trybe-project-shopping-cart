@@ -1,5 +1,5 @@
 // Esse tipo de comentário que estão antes de todas as funções são chamados de JSdoc,
-// experimente passar o mouse sobre o nome das funções e verá que elas possuem descrições! 
+// experimente passar o mouse sobre o nome das funções e verá que elas possuem descrições!
 
 // Fique a vontade para modificar o código já escrito e criar suas próprias funções!
 
@@ -15,15 +15,49 @@ const createProductImageElement = (imageSource) => {
   return img;
 };
 
-const saveCart = () => {
-  const save = [];
-  const array = document.querySelectorAll('li');
-  Array.from(array).forEach((element) => {
-  save.push(element.id);
- });
- saveCartItems(save);
+const sum = [];
+const amount = (price) => {  
+  sum.push(price);
+  /* sum.reduce((prev, curr) => prev + curr, 0); */
+  const value = document.getElementsByClassName('total-price');
+
+  /* if (value.value) {
+    value.value += price;
+  } else {
+    value.value = price;
+  }
+  cartItems.reduce((acc, curr) => acc + curr.price, 0);
+  const sum = value.value;
+  /* const convert = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(sum); */
+
+  /* value[0].innerHTML = convert; */
+  value[0].innerHTML = sum;
 };
 
+const saveCart = ({ id, title, price }) => {
+  const save = [];
+ /*  const { id, title, price } = params[0]; */
+  const obj = { id, title, price };
+  const arrayLoad = getSavedCartItems('cartItem');
+  if (arrayLoad) {
+    arrayLoad.forEach((element) => {
+      save.push(element);
+    });
+  }  
+  save.push(obj);
+  saveCartItems(save);
+};
+/* const saveCart = (id, title, price) => {
+  const save = [];
+  const obj = { id, title, price };
+  save.push(obj);
+  
+  saveCartItems(save);
+};
+ */
 /**
  * Função responsável por criar e retornar um item do carrinho.
  * @param {Object} product - Objeto do produto.
@@ -32,17 +66,27 @@ const saveCart = () => {
  * @param {string} product.price - Preço do produto.
  * @returns {Element} Elemento de um item do carrinho.
  */
+const removeCartItem = (id) => {
+  let save = [];
+  document.getElementById(id).remove();
+  const arrayLoad = getSavedCartItems('cartItem');
+  if (arrayLoad) {      
+    const index = arrayLoad.findIndex((item) => item.id === id);
+    arrayLoad.splice(index, 1);
+    save = arrayLoad;
+  }
+  saveCartItems(save);
+};
 
- const createCartItemElement = ({ id, title, price }) => {
+const createCartItemElement = ({ id, title, price }) => {  
   const li = document.createElement('li');
   li.className = 'cart__item';
   const text = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
   li.innerText = text;
-  li.id = id;  
+  li.id = id;
   li.onclick = () => {
-    document.getElementById(id).remove();
-    saveCart();
-  };   
+    removeCartItem(id);
+  };
   return li;
 };
 
@@ -64,16 +108,17 @@ const createCustomElement = (element, className, innerText) => {
       const data = await fetchItem(idItem);
       const { id, title, price } = data;
       cart.appendChild(createCartItemElement({ id, title, price }));
-      saveCart();
-    };  
+      amount(price);
+      saveCart({ id, title, price });
+    };
   }
-  
+
   return e;
 };
 
 /**
  * Função responsável por criar e retornar o elemento do produto.
- * @param {Object} product - Objeto do produto. 
+ * @param {Object} product - Objeto do produto.
  * @param {string} product.id - ID do produto.
  * @param {string} product.title - Título do produto.
  * @param {string} product.thumbnail - URL da imagem do produto.
@@ -87,7 +132,7 @@ const createProductItemElement = ({ id, title, thumbnail }) => {
   section.appendChild(createCustomElement('span', 'item__title', title));
   section.appendChild(createProductImageElement(thumbnail));
   section.appendChild(createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'));
-  
+
   return section;
 };
 
@@ -96,7 +141,8 @@ const createProductItemElement = ({ id, title, thumbnail }) => {
  * @param {Element} product - Elemento do produto.
  * @returns {string} ID do produto.
  */
-const getIdFromProductItem = (product) => product.querySelector('span.id').innerText;
+const getIdFromProductItem = (product) =>
+  product.querySelector('span.id').innerText;
 
 const createPage = async () => {
   const items = document.querySelector('.items');
@@ -104,23 +150,23 @@ const createPage = async () => {
   const { results } = data;
   results.forEach((result) => {
     const { id, title, thumbnail } = result;
-  items.appendChild(createProductItemElement({ id, title, thumbnail }));
+    items.appendChild(createProductItemElement({ id, title, thumbnail }));
   });
 };
 
 const loadCartItems = () => {
-  const array = getSavedCartItems('cartItem'); 
+  const array = getSavedCartItems('cartItem');
   if (array) {
     array.forEach(async (item) => {
-      const cart = document.querySelector('.cart__items');  
-    const data = await fetchItem(item);
-    const { id, title, price } = data;
-    cart.appendChild(createCartItemElement({ id, title, price }));
-    }); 
+      const cart = document.querySelector('.cart__items');      
+      const { id, title, price } = item;
+      amount(price);
+      cart.appendChild(createCartItemElement({ id, title, price }));
+    });
   }
 };
 
 window.onload = () => {
   createPage();
   loadCartItems();
- };
+};
