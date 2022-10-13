@@ -27,7 +27,10 @@ const createProductImageElement = (imageSource) => {
   const li = document.createElement('li');
   li.className = 'cart__item';
   li.innerText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
-  /* li.addEventListener('click', cartItemClickListener); */
+  li.id = id;
+  li.onclick = () => {
+    document.getElementById(id).remove();
+  };  
   return li;
 };
 
