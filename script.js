@@ -15,26 +15,27 @@ const createProductImageElement = (imageSource) => {
   return img;
 };
 
-const sum = [];
-const amount = (price) => {  
-  sum.push(price);
-  /* sum.reduce((prev, curr) => prev + curr, 0); */
-  const value = document.getElementsByClassName('total-price');
-
-  /* if (value.value) {
-    value.value += price;
-  } else {
-    value.value = price;
-  }
-  cartItems.reduce((acc, curr) => acc + curr.price, 0);
-  const sum = value.value;
-  /* const convert = new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(sum); */
-
-  /* value[0].innerHTML = convert; */
+let sum = 0;
+const amount = (price, type) => {
+  if (type === 'out') {
+    sum -= price;
+  const value = document.getElementsByClassName('total-price'); 
   value[0].innerHTML = sum;
+  } else {
+    sum += price;
+    const value = document.getElementsByClassName('total-price');   
+    value[0].innerHTML = sum;
+  }
+ /*  const value = document.getElementsByClassName('total-price');
+  const cartList = document.querySelector('.cart__items').childNodes;
+  if (cartList.length > 0) {
+    cartList.forEach(async (element) => {
+      const data = await fetchItem(element.id);
+      const { price } = data;
+      sum += price;
+      value[0].innerHTML = sum; 
+  });  
+  }  */  
 };
 
 const saveCart = ({ id, title, price }) => {
@@ -50,14 +51,6 @@ const saveCart = ({ id, title, price }) => {
   save.push(obj);
   saveCartItems(save);
 };
-/* const saveCart = (id, title, price) => {
-  const save = [];
-  const obj = { id, title, price };
-  save.push(obj);
-  
-  saveCartItems(save);
-};
- */
 /**
  * Função responsável por criar e retornar um item do carrinho.
  * @param {Object} product - Objeto do produto.
@@ -66,7 +59,7 @@ const saveCart = ({ id, title, price }) => {
  * @param {string} product.price - Preço do produto.
  * @returns {Element} Elemento de um item do carrinho.
  */
-const removeCartItem = (id) => {
+const removeCartItem = (id, price) => {
   let save = [];
   document.getElementById(id).remove();
   const arrayLoad = getSavedCartItems('cartItem');
@@ -75,6 +68,8 @@ const removeCartItem = (id) => {
     arrayLoad.splice(index, 1);
     save = arrayLoad;
   }
+  
+  amount(price, 'out');
   saveCartItems(save);
 };
 
@@ -85,7 +80,7 @@ const createCartItemElement = ({ id, title, price }) => {
   li.innerText = text;
   li.id = id;
   li.onclick = () => {
-    removeCartItem(id);
+    removeCartItem(id, price);
   };
   return li;
 };
