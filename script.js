@@ -15,6 +15,15 @@ const createProductImageElement = (imageSource) => {
   return img;
 };
 
+const saveCart = () => {
+  const save = [];
+  const array = document.querySelectorAll('li');
+  Array.from(array).forEach((element) => {
+  save.push(element.id);
+ });
+ saveCartItems(save);
+};
+
 /**
  * Função responsável por criar e retornar um item do carrinho.
  * @param {Object} product - Objeto do produto.
@@ -23,14 +32,17 @@ const createProductImageElement = (imageSource) => {
  * @param {string} product.price - Preço do produto.
  * @returns {Element} Elemento de um item do carrinho.
  */
+
  const createCartItemElement = ({ id, title, price }) => {
   const li = document.createElement('li');
   li.className = 'cart__item';
-  li.innerText = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
-  li.id = id;
+  const text = `ID: ${id} | TITLE: ${title} | PRICE: $${price}`;
+  li.innerText = text;
+  li.id = id;  
   li.onclick = () => {
     document.getElementById(id).remove();
-  };  
+    saveCart();
+  };   
   return li;
 };
 
@@ -52,6 +64,7 @@ const createCustomElement = (element, className, innerText) => {
       const data = await fetchItem(idItem);
       const { id, title, price } = data;
       cart.appendChild(createCartItemElement({ id, title, price }));
+      saveCart();
     };  
   }
   
@@ -95,6 +108,19 @@ const createPage = async () => {
   });
 };
 
+const loadCartItems = () => {
+  const array = getSavedCartItems('cartItem'); 
+  if (array) {
+    array.forEach(async (item) => {
+      const cart = document.querySelector('.cart__items');  
+    const data = await fetchItem(item);
+    const { id, title, price } = data;
+    cart.appendChild(createCartItemElement({ id, title, price }));
+    }); 
+  }
+};
+
 window.onload = () => {
   createPage();
+  loadCartItems();
  };
