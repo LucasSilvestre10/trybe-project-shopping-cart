@@ -1,4 +1,7 @@
 const totalPrice = 'total-price';
+const divLoading = document.getElementById('div-loading');
+const loading = document.getElementById('loading');
+
 // Esse tipo de comentário que estão antes de todas as funções são chamados de JSdoc,
 // experimente passar o mouse sobre o nome das funções e verá que elas possuem descrições!
 
@@ -131,6 +134,9 @@ const getIdFromProductItem = (product) =>
   product.querySelector('span.id').innerText;
 
 const createPage = async () => {
+  divLoading.style.display = 'flex';
+  loading.innerHTML = 'carregando...';
+  
   const items = document.querySelector('.items');
   const data = await fetchProducts('computador');
   const { results } = data;
@@ -138,6 +144,8 @@ const createPage = async () => {
     const { id, title, thumbnail } = result;
     items.appendChild(createProductItemElement({ id, title, thumbnail }));
   });
+  divLoading.style.display = 'none';  
+  loading.remove();
 };
 
 const loadCartItems = () => {
